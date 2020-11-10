@@ -1,17 +1,11 @@
 package com.zhangjunchao.virtual;
 
-import java.io.Closeable;
-import java.io.IOException;
-import java.io.OutputStream;
-
-public class TerminalSendGpsThread extends Thread implements Closeable {
-    OutputStream os;
+public class TerminalSendGpsThread extends Thread {
     String terminalId;
     SendMess sendMess;
 
-    public TerminalSendGpsThread(String terminalId, OutputStream os,SendMess sendMess) {
+    public TerminalSendGpsThread(String terminalId, SendMess sendMess) {
         this.terminalId = terminalId;
-        this.os = os;
         this.sendMess = sendMess;
     }
 
@@ -27,8 +21,4 @@ public class TerminalSendGpsThread extends Thread implements Closeable {
         }
     }
 
-    @Override
-    public void close() throws IOException {
-        os.close();
-    }
 }

@@ -1,4 +1,4 @@
-package com.zhangjunchao.virtual;
+package com.zhangjunchao.virtual.server;
 
 import java.io.IOException;
 import java.net.ServerSocket;

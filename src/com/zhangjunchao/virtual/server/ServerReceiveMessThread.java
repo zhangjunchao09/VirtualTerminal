@@ -1,4 +1,4 @@
-package com.zhangjunchao.virtual;
+package com.zhangjunchao.virtual.server;
 
 import java.io.Closeable;
 import java.io.IOException;
@@ -65,7 +65,6 @@ public class ServerReceiveMessThread extends Thread implements Closeable {
                     System.out.println(new Date() + "  server receive：  " + new String(data, 0, data.length, "UTF-8"));
                     count = 1;
                     data = new byte[1];
-                    new SendMess(socket.getOutputStream()).sendMessage("hello");
                 }
                 sleep(1000);
             }
