@@ -2,18 +2,13 @@ package com.zhangjunchao.virtual;
 
 import com.zhangjunchao.virtual.utils.DataTransUtils;
 
-import java.io.Closeable;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.Date;
 
-public class ReceiveMessThread extends Thread implements Closeable {
-
-    InputStream in;
+public class ReceiveMessThread extends Thread {
     SendMess sendMess;
 
-    public ReceiveMessThread(InputStream in, SendMess sendMess) {
-        this.in = in;
+    public ReceiveMessThread(SendMess sendMess) {
         this.sendMess = sendMess;
     }
 
@@ -26,7 +21,7 @@ public class ReceiveMessThread extends Thread implements Closeable {
             int count = 1;
             byte[] data = new byte[batch];
             while (true) {
-                len = in.read(buf);
+                len = VirtualTerminal12.in.read(buf);
                 if (len == batch) {
                     if (count > 1) {
                         byte[] t = data;
@@ -75,11 +70,6 @@ public class ReceiveMessThread extends Thread implements Closeable {
             e.printStackTrace();
         }
 
-    }
-
-    @Override
-    public void close() throws IOException {
-        in.close();
     }
 
 

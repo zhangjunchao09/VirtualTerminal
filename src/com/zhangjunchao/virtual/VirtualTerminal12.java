@@ -43,7 +43,7 @@ public class VirtualTerminal12 implements Closeable {
             in = socket.getInputStream();
             SendMess sendMess = new SendMess();
 
-            new ReceiveMessThread(in, sendMess).start();
+            new ReceiveMessThread(sendMess).start();
 
             sendMess.sendMessage(Protocol12.getLoginStr(terminalId));
 
