@@ -9,9 +9,11 @@ public class SendMess {
 
     public void sendMessage(String msg) {
         try {
-            VirtualTerminal12.os.write(DataTransUtils.strToBytes(msg));
-            VirtualTerminal12.os.flush();
-            System.out.println(new Date() + "  send：  " + msg);
+            if (VirtualTerminal12.os != null) {
+                VirtualTerminal12.os.write(DataTransUtils.strToBytes(msg));
+                VirtualTerminal12.os.flush();
+                System.out.println(new Date() + "  send：  " + msg);
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }

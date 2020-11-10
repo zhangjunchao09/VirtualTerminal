@@ -23,6 +23,7 @@ public class VirtualTerminal12 implements Closeable {
     public static Socket socket = new Socket();
     public static OutputStream os;
     public static InputStream in;
+    public static SendMess sendMess;
 
     private static Options options = new Options();
 
@@ -41,13 +42,13 @@ public class VirtualTerminal12 implements Closeable {
             socket.connect(new InetSocketAddress(ip, port), 2000);
             os = socket.getOutputStream();
             in = socket.getInputStream();
-            SendMess sendMess = new SendMess();
+            sendMess = new SendMess();
 
-            new ReceiveMessThread(sendMess).start();
+            new ReceiveMessThread().start();
 
             sendMess.sendMessage(Protocol12.getLoginStr(terminalId));
 
-            TerminalSendGpsThread terminalSendGpsThread = new TerminalSendGpsThread(terminalId, sendMess);
+            TerminalSendGpsThread terminalSendGpsThread = new TerminalSendGpsThread(terminalId);
             terminalSendGpsThread.start();
 
             new ParamSetThread().start();
