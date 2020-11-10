@@ -13,6 +13,8 @@ import java.io.OutputStream;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 
+import static java.lang.Thread.sleep;
+
 public class VirtualTerminal12 implements Closeable {
     private static String terminalId = "157D520070002";
     private static String ip = "10.39.52.67";
@@ -24,6 +26,7 @@ public class VirtualTerminal12 implements Closeable {
     public static OutputStream os;
     public static InputStream in;
     public static SendMess sendMess;
+    public static TerminalSendGpsThread terminalSendGpsThread;
 
     private static Options options = new Options();
 
@@ -48,15 +51,16 @@ public class VirtualTerminal12 implements Closeable {
 
             sendMess.sendMessage(Protocol12.getLoginStr(terminalId));
 
-            TerminalSendGpsThread terminalSendGpsThread = new TerminalSendGpsThread(terminalId);
+            terminalSendGpsThread = new TerminalSendGpsThread(terminalId);
             terminalSendGpsThread.start();
 
-            new ParamSetThread().start();
-            while (terminalSendGpsThread.isAlive()) {
-
+            new ParamSetThread(terminalId).start();
+            while (true) {
+                sleep(1000);
             }
-            System.out.println("退出");
         } catch (IOException e) {
+            e.printStackTrace();
+        } catch (InterruptedException e) {
             e.printStackTrace();
         } finally {
             if (socket != null) {

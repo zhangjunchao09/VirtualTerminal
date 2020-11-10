@@ -21,6 +21,12 @@ public class ParamSetThread extends Thread implements Closeable {
         options.addOption("t", "time_interval", true, "time_interval default 10000");
     }
 
+    String terminalId;
+
+    public ParamSetThread(String terminalId) {
+        this.terminalId = terminalId;
+    }
+
     @Override
     public void run() {
         while (true) {
@@ -47,6 +53,9 @@ public class ParamSetThread extends Thread implements Closeable {
             }
             if (cmd.hasOption('t')) {
                 VirtualTerminal12.time_interval = Integer.parseInt(cmd.getOptionValue('t'));
+                VirtualTerminal12.terminalSendGpsThread.stop();
+                VirtualTerminal12.terminalSendGpsThread = new TerminalSendGpsThread(terminalId);
+                VirtualTerminal12.terminalSendGpsThread.start();
             }
 
         } catch (ParseException e) {
