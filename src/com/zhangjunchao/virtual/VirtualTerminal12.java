@@ -16,7 +16,7 @@ import java.net.Socket;
 import static java.lang.Thread.sleep;
 
 public class VirtualTerminal12 implements Closeable {
-    private static String terminalId = "157D520070002";
+    private static String terminalId = "157D520070005";
     private static String ip = "10.39.52.67";
     private static int port = 2603;
     public static double lat = 25.626133;

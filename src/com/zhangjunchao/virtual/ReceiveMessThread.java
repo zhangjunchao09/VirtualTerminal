@@ -1,6 +1,7 @@
 package com.zhangjunchao.virtual;
 
 import com.zhangjunchao.virtual.utils.DataTransUtils;
+import com.zhangjunchao.virtual.utils.ParamsUtils;
 
 import java.io.IOException;
 import java.util.Date;
@@ -72,6 +73,27 @@ public class ReceiveMessThread extends Thread {
 
     public void handlReceive(String receive) {
         System.out.println(new Date() + "  client receive：  " + receive);
-        //VirtualTerminal12.sendMess.sendMessage("hello");
+        int cmdId = Integer.parseInt(receive.substring(4, 6), 16);
+        String ser = receive.substring(6, 14);
+        String ter = receive.substring(14, 27);
+        int dataLen = Integer.parseInt(receive.substring(30, 34), 16);
+        String data = receive.substring(34, (receive.length() - 4));
+
+        if (cmdId == 0x12) {
+            String key = data.substring(0, 2);
+            String opt = data.substring(2, 4);
+            if (opt.equals("01")) {
+                String value = data.substring(4, 6);
+                ParamsUtils.params.put(key, value);
+                VirtualTerminal12.sendMess.sendMessage(Protocol12.paramSetResponse(ter, ser));
+            }
+            if (opt.equals("00")) {
+                String value = ParamsUtils.params.get(key);
+                VirtualTerminal12.sendMess.sendMessage(Protocol12.paramQueryResponse(ter, ser));
+            }
+        }
+        if (cmdId == 0x11) {
+            VirtualTerminal12.sendMess.sendMessage(Protocol12.locateQueryResponse(ter, ser, VirtualTerminal12.lat, VirtualTerminal12.lon));
+        }
     }
 }

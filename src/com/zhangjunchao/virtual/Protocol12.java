@@ -6,6 +6,7 @@ public class Protocol12 {
 
     /**
      * 12 登陆
+     *
      * @param terminalId
      * @return
      */
@@ -27,5 +28,32 @@ public class Protocol12 {
         String serialNumber = "00000000";
         String end = "760D";
         return start + cmd + serialNumber + terminalId + "000" + dataLen + dataBlock + end;
+    }
+
+    public static String locateQueryResponse(String terminalId, String serialNumber, double lat, double lon) {
+        String start = "5A4C";
+        String cmd = "17";
+        String dataBlock = "D4" + "0B0309092C" + LatLonUtil.parseLonOrLat(lat, false) + LatLonUtil.parseLonOrLat(lon, false) + "065900";
+        String dataLen = String.format("%04x", dataBlock.length() / 2);
+        String end = "760D";
+        return start + cmd + serialNumber + terminalId + "000" + dataLen + dataBlock + end;
+    }
+
+    public static String paramSetResponse(String terminalId, String ser) {
+        String start = "5A4C";
+        String cmd = "18";
+        String dataBlock = "1200";
+        String dataLen = String.format("%04x", dataBlock.length() / 2);
+        String end = "760D";
+        return start + cmd + ser + terminalId + "000" + dataLen + dataBlock + end;
+    }
+
+    public static String paramQueryResponse(String terminalId, String ser) {
+        String start = "5A4C";
+        String cmd = "18";
+        String dataBlock = "1200";
+        String dataLen = String.format("%04x", dataBlock.length() / 2);
+        String end = "760D";
+        return start + cmd + ser + terminalId + "000" + dataLen + dataBlock + end;
     }
 }
