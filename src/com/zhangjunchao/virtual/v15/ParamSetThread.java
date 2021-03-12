@@ -1,4 +1,4 @@
-package com.zhangjunchao.virtual;
+package com.zhangjunchao.virtual.v15;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
@@ -46,16 +46,16 @@ public class ParamSetThread extends Thread implements Closeable {
         try {
             CommandLine cmd = parser.parse(options, args);
             if (cmd.hasOption('x')) {
-                VirtualTerminal12.lat = Double.parseDouble(cmd.getOptionValue('x'));
+                VirtualTerminal15.lat = Double.parseDouble(cmd.getOptionValue('x'));
             }
             if (cmd.hasOption('y')) {
-                VirtualTerminal12.lon = Double.parseDouble(cmd.getOptionValue('y'));
+                VirtualTerminal15.lon = Double.parseDouble(cmd.getOptionValue('y'));
             }
             if (cmd.hasOption('t')) {
-                VirtualTerminal12.time_interval = Integer.parseInt(cmd.getOptionValue('t'));
-                VirtualTerminal12.terminalSendGpsThread.stop();
-                VirtualTerminal12.terminalSendGpsThread = new TerminalSendGpsThread(terminalId);
-                VirtualTerminal12.terminalSendGpsThread.start();
+                VirtualTerminal15.time_interval = Integer.parseInt(cmd.getOptionValue('t'));
+                VirtualTerminal15.terminalSendGpsThread.stop();
+                VirtualTerminal15.terminalSendGpsThread = new TerminalSendGpsThread(terminalId);
+                VirtualTerminal15.terminalSendGpsThread.start();
             }
 
         } catch (ParseException e) {

@@ -1,4 +1,4 @@
-package com.zhangjunchao.virtual;
+package com.zhangjunchao.virtual.v15;
 
 import com.zhangjunchao.virtual.utils.DataTransUtils;
 
@@ -9,9 +9,9 @@ public class SendMess {
 
     public void sendMessage(String msg) {
         try {
-            if (VirtualTerminal12.os != null) {
-                VirtualTerminal12.os.write(DataTransUtils.strToBytes(msg));
-                VirtualTerminal12.os.flush();
+            if (VirtualTerminal15.os != null) {
+                VirtualTerminal15.os.write(DataTransUtils.strToBytes(msg));
+                VirtualTerminal15.os.flush();
                 System.out.println(new Date() + "  send：  " + msg);
             }
         } catch (IOException e) {

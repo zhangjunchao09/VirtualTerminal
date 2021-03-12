@@ -1,4 +1,4 @@
-package com.zhangjunchao.virtual;
+package com.zhangjunchao.virtual.v12;
 
 public class TerminalSendGpsThread extends Thread {
     String terminalId;

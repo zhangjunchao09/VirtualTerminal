@@ -1,4 +1,4 @@
-package com.zhangjunchao.virtual;
+package com.zhangjunchao.virtual.v15;
 
 import com.zhangjunchao.virtual.utils.DataTransUtils;
 import com.zhangjunchao.virtual.utils.ParamsUtils;
@@ -17,8 +17,8 @@ public class ReceiveMessThread extends Thread {
             int count = 1;
             byte[] data = new byte[batch];
             while (true) {
-                if (VirtualTerminal12.in != null) {
-                    len = VirtualTerminal12.in.read(buf);
+                if (VirtualTerminal15.in != null) {
+                    len = VirtualTerminal15.in.read(buf);
                     if (len == batch) {
                         if (count > 1) {
                             byte[] t = data;
@@ -85,18 +85,18 @@ public class ReceiveMessThread extends Thread {
             if (opt.equals("01")) {
                 String value = data.substring(4, 6);
                 ParamsUtils.params.put(key, value);
-                VirtualTerminal12.sendMess.sendMessage(Protocol12.paramSetResponse(ter, ser));
+                VirtualTerminal15.sendMess.sendMessage(Protocol15.paramSetResponse(ter, ser));
             }
             if (opt.equals("00")) {
                 String value = ParamsUtils.params.get(key);
-                VirtualTerminal12.sendMess.sendMessage(Protocol12.paramQueryResponse(ter, ser));
+                VirtualTerminal15.sendMess.sendMessage(Protocol15.paramQueryResponse(ter, ser));
             }
         }
         if (cmdId == 0x11) {
-            VirtualTerminal12.sendMess.sendMessage(Protocol12.locateQueryResponse(ter, ser, VirtualTerminal12.lat, VirtualTerminal12.lon));
+            VirtualTerminal15.sendMess.sendMessage(Protocol15.locateQueryResponse(ter, ser, VirtualTerminal15.lat, VirtualTerminal15.lon));
         }
         if (cmdId == 0x13) {
-            VirtualTerminal12.sendMess.sendMessage(Protocol12.limitSpeedResponse(ter, ser));
+            VirtualTerminal15.sendMess.sendMessage(Protocol15.limitSpeedResponse(ter, ser));
         }
     }
 }
