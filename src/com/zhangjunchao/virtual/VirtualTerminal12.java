@@ -16,12 +16,12 @@ import java.net.Socket;
 import static java.lang.Thread.sleep;
 
 public class VirtualTerminal12 implements Closeable {
-    private static String terminalId = "157D520070005";
+    private static String terminalId = "157AD27320010";
     private static String ip = "10.39.52.67";
     private static int port = 2603;
     public static double lat = 25.626133;
     public static double lon = 122.075813;
-    public static int time_interval = 10000;
+    public static int time_interval = 100000;
     public static Socket socket = new Socket();
     public static OutputStream os;
     public static InputStream in;

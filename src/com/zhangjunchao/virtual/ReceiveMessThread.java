@@ -95,5 +95,8 @@ public class ReceiveMessThread extends Thread {
         if (cmdId == 0x11) {
             VirtualTerminal12.sendMess.sendMessage(Protocol12.locateQueryResponse(ter, ser, VirtualTerminal12.lat, VirtualTerminal12.lon));
         }
+        if (cmdId == 0x13) {
+            VirtualTerminal12.sendMess.sendMessage(Protocol12.limitSpeedResponse(ter, ser));
+        }
     }
 }

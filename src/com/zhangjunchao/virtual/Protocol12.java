@@ -56,4 +56,13 @@ public class Protocol12 {
         String end = "760D";
         return start + cmd + ser + terminalId + "000" + dataLen + dataBlock + end;
     }
+
+    public static String limitSpeedResponse(String terminalId, String serialNumber) {
+        String start = "5A4C";
+        String cmd = "13";
+        String dataBlock = "13014D0100FFFFFFFFFFFFFFFFFFFB0D";
+        String dataLen = String.format("%04x", dataBlock.length() / 2);
+        String end = "760D";
+        return start + cmd + serialNumber + terminalId + "000" + dataLen + dataBlock + end;
+    }
 }
