@@ -19,45 +19,47 @@ public class ReceiveMessThread extends Thread {
             while (true) {
                 if (VirtualTerminal15.in != null) {
                     len = VirtualTerminal15.in.read(buf);
-                    if (len == batch) {
-                        if (count > 1) {
-                            byte[] t = data;
-                            int length = (count - 1) * batch + len;
-                            data = new byte[length];
-                            for (int i = 0; i < t.length; i++) {
-                                data[i] = t[i];
+                    if (len != -1) {
+                        if (len == batch) {
+                            if (count > 1) {
+                                byte[] t = data;
+                                int length = (count - 1) * batch + len;
+                                data = new byte[length];
+                                for (int i = 0; i < t.length; i++) {
+                                    data[i] = t[i];
+                                }
+                                for (int i = t.length; i < length; i++) {
+                                    data[i] = buf[i];
+                                }
+                            } else {
+                                data = new byte[len];
+                                for (int i = 0; i < len; i++) {
+                                    data[i] = buf[i];
+                                }
                             }
-                            for (int i = t.length; i < length; i++) {
-                                data[i] = buf[i];
-                            }
+                            count++;
                         } else {
-                            data = new byte[len];
-                            for (int i = 0; i < len; i++) {
-                                data[i] = buf[i];
+                            if (count > 1) {
+                                byte[] t = data;
+                                int length = (count - 1) * batch + len;
+                                data = new byte[length];
+                                for (int i = 0; i < t.length; i++) {
+                                    data[i] = t[i];
+                                }
+                                for (int i = t.length; i < length; i++) {
+                                    data[i] = buf[i];
+                                }
+                            } else {
+                                data = new byte[len];
+                                for (int i = 0; i < len; i++) {
+                                    data[i] = buf[i];
+                                }
                             }
+                            String receive = DataTransUtils.bytesToHexString(data);
+                            handlReceive(receive);
+                            count = 1;
+                            data = new byte[1];
                         }
-                        count++;
-                    } else {
-                        if (count > 1) {
-                            byte[] t = data;
-                            int length = (count - 1) * batch + len;
-                            data = new byte[length];
-                            for (int i = 0; i < t.length; i++) {
-                                data[i] = t[i];
-                            }
-                            for (int i = t.length; i < length; i++) {
-                                data[i] = buf[i];
-                            }
-                        } else {
-                            data = new byte[len];
-                            for (int i = 0; i < len; i++) {
-                                data[i] = buf[i];
-                            }
-                        }
-                        String receive = DataTransUtils.bytesToHexString(data);
-                        handlReceive(receive);
-                        count = 1;
-                        data = new byte[1];
                     }
                 }
                 sleep(1000);

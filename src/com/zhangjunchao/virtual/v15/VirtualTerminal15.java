@@ -16,9 +16,9 @@ import java.net.Socket;
 import static java.lang.Thread.sleep;
 
 public class VirtualTerminal15 implements Closeable {
-    private static String terminalId = "157AD27320010";
+    private static String terminalId = "152A748600001";
     private static String ip = "10.39.52.227";
-    private static int port = 2603;
+    private static int port = 7066;
     public static double lat = 25.626133;
     public static double lon = 122.075813;
     public static int time_interval = 100000;
@@ -27,6 +27,8 @@ public class VirtualTerminal15 implements Closeable {
     public static InputStream in;
     public static SendMess sendMess;
     public static TerminalSendGpsThread terminalSendGpsThread;
+
+    private static String type = "4E4AA114";
 
     private static Options options = new Options();
 
@@ -41,6 +43,8 @@ public class VirtualTerminal15 implements Closeable {
 
     public static void main(String[] args) {
         setOptions(args);
+        float f = 1.00000103f;
+        System.out.println(f);
         try {
             socket.connect(new InetSocketAddress(ip, port), 2000);
             os = socket.getOutputStream();
@@ -48,7 +52,7 @@ public class VirtualTerminal15 implements Closeable {
             sendMess = new SendMess();
 
             new ReceiveMessThread().start();
-
+            Protocol15.setType(type);
             sendMess.sendMessage(Protocol15.getLoginStr(terminalId));
 
             terminalSendGpsThread = new TerminalSendGpsThread(terminalId);
