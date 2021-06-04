@@ -1,4 +1,6 @@
-package com.zhangjunchao.virtual.mqtt;
+package com.zhangjunchao.virtual.mqtt.utils;
+
+import com.zhangjunchao.virtual.mqtt.model.LoginInfo;
 
 import javax.crypto.Mac;
 import javax.crypto.SecretKey;

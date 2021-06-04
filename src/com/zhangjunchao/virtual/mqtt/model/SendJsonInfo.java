@@ -1,4 +1,4 @@
-package com.zhangjunchao.virtual.mqtt;
+package com.zhangjunchao.virtual.mqtt.model;
 
 import java.util.HashMap;
 

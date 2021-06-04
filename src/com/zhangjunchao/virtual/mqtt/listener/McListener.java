@@ -1,27 +1,42 @@
-package com.zhangjunchao.virtual.mqtt;
+package com.zhangjunchao.virtual.mqtt.listener;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.zhangjunchao.virtual.mqtt.model.ChildDeviceLoginInfo;
+import com.zhangjunchao.virtual.mqtt.model.DeviceInfo;
+import com.zhangjunchao.virtual.mqtt.model.LoginInfo;
+import com.zhangjunchao.virtual.mqtt.model.Params;
+import com.zhangjunchao.virtual.mqtt.utils.Signature;
 import org.eclipse.paho.client.mqttv3.*;
 import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
 
+import java.util.List;
+
 public class McListener {
 
+    private static final Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
+
     private String host;
-    private String deviceId;
-    private String productId;
-    private String secret;
+
+    private DeviceInfo parentDevice;
+
+    private List<DeviceInfo> childDevices;
 
     private MqttClient client_sub;
     private MqttConnectOptions options_sub;
 
-    public McListener(String host, String deviceId, String productId, String secret) {
+    public McListener(String host, DeviceInfo parentDevice) {
         this.host = host;
-        this.deviceId = deviceId;
-        this.productId = productId;
-        this.secret = secret;
+        this.parentDevice = parentDevice;
     }
 
     public void initMQTTListener() {
         try {
+
+            String deviceId = parentDevice.getDeviceId();
+            String productId = parentDevice.getProductId();
+            String secret = parentDevice.getSecret();
+
             String login_reply_topic = String.format("/ext/session/%s/%s/combine/login_reply", productId, deviceId);
             String property_set_topic = String.format("/sys/%s/%s/thing/service/property/set", productId, deviceId);
             LoginInfo loginInfoParent = Signature.mqttInfo(deviceId, productId, secret);
@@ -94,6 +109,33 @@ public class McListener {
         }
     }
 
+    public void childDeviceLogin(DeviceInfo childDevice) {
+        String login_topic = String.format("/ext/session/%s/%s/combine/login", parentDevice.getProductId(), parentDevice.getDeviceId());
+
+        LoginInfo loginInfoChildren = Signature.mqttInfo(childDevice.getDeviceId(), childDevice.getProductId(), childDevice.getSecret());
+        Params params = new Params();
+        params.setDeviceId(childDevice.getDeviceId());
+        params.setProductId(childDevice.getProductId());
+        params.setClientId(loginInfoChildren.getClientId());
+        params.setSign(loginInfoChildren.getPassword());
+        params.setTimestamp(loginInfoChildren.getTimestamp());
+
+        ChildDeviceLoginInfo childDeviceLoginInfo = new ChildDeviceLoginInfo();
+        childDeviceLoginInfo.setParams(params);
+        String loginJSON = gson.toJson(childDeviceLoginInfo);
+        MqttMessage msg_pub = new MqttMessage(loginJSON.getBytes());
+        msg_pub.setQos(0);
+        try {
+            publish(login_topic, msg_pub);
+
+            String child_property_set_topic = String.format("/sys/%s/%s/thing/service/property/set", childDevice.getProductId(), childDevice.getDeviceId());
+            subscribe(child_property_set_topic, 0);
+
+        } catch (MqttException e) {
+            System.err.println("=======发布主题消息失败：topic: {}=========" + login_topic);
+        }
+    }
+
     public void subscribe(String topic, int qos) throws MqttException {
         this.client_sub.subscribe(topic, qos);
     }
@@ -106,27 +148,19 @@ public class McListener {
         return client_sub;
     }
 
-    public String getDeviceId() {
-        return deviceId;
+    public DeviceInfo getParentDevice() {
+        return parentDevice;
     }
 
-    public void setDeviceId(String deviceId) {
-        this.deviceId = deviceId;
+    public void setParentDevice(DeviceInfo parentDevice) {
+        this.parentDevice = parentDevice;
     }
 
-    public String getProductId() {
-        return productId;
+    public List<DeviceInfo> getChildDevices() {
+        return childDevices;
     }
 
-    public void setProductId(String productId) {
-        this.productId = productId;
-    }
-
-    public String getSecret() {
-        return secret;
-    }
-
-    public void setSecret(String secret) {
-        this.secret = secret;
+    public void setChildDevices(List<DeviceInfo> childDevices) {
+        this.childDevices = childDevices;
     }
 }

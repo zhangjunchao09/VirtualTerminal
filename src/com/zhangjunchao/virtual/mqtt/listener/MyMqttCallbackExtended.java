@@ -1,4 +1,4 @@
-package com.zhangjunchao.virtual.mqtt;
+package com.zhangjunchao.virtual.mqtt.listener;
 
 import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
 import org.eclipse.paho.client.mqttv3.MqttCallbackExtended;
@@ -8,14 +8,14 @@ public class MyMqttCallbackExtended implements MqttCallbackExtended {
 
     McListener mcListener;
 
-    String login_reply_topic = String.format("/ext/session/%s/%s/combine/login_reply", mcListener.getProductId(), mcListener.getDeviceId());
-    String property_set_topic = String.format("/sys/%s/%s/thing/service/property/set", mcListener.getProductId(), mcListener.getDeviceId());
+    String login_reply_topic = String.format("/ext/session/%s/%s/combine/login_reply", mcListener.getParentDevice().getProductId(), mcListener.getParentDevice().getDeviceId());
+    String property_set_topic = String.format("/sys/%s/%s/thing/service/property/set", mcListener.getParentDevice().getProductId(), mcListener.getParentDevice().getDeviceId());
 
     //订阅topic定义
     int[] Qos = new int[]{0, 0};
     String[] topics = new String[]{login_reply_topic, property_set_topic};
 
-    MyMqttCallbackExtended(McListener mcListener) {
+    public MyMqttCallbackExtended(McListener mcListener) {
         this.mcListener = mcListener;
     }
 

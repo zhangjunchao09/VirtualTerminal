@@ -1,4 +1,4 @@
-package com.zhangjunchao.virtual.mqtt;
+package com.zhangjunchao.virtual.mqtt.model;
 
 public class Params {
     private String productId;

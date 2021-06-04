@@ -1,4 +1,4 @@
-package com.zhangjunchao.virtual.mqtt;
+package com.zhangjunchao.virtual.mqtt.model;
 
 public class ChildDeviceLoginInfo {
     private String id = "123";
