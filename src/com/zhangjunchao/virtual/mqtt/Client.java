@@ -54,7 +54,7 @@ public class Client {
                     String opt = argss[0];
                     switch (opt) {
                         case "-sc":
-                            String topicSC = String.format("/sys/%s/%s/thing/event/property/post", childProductId, childDeviceId);
+                            String topicSC = childDevice.getPropertyPostTopic();
                             HashMap mapSC = gson.fromJson(argss[1], HashMap.class);
                             SendJsonInfo sendJsonInfoSC = new SendJsonInfo();
                             sendJsonInfoSC.setParams(mapSC);
@@ -63,7 +63,7 @@ public class Client {
                             mcListener.publish(topicSC, content);
                             break;
                         case "-sp":
-                            String topicSP = String.format("/sys/%s/%s/thing/service/property/post", productId, deviceId);
+                            String topicSP = parentDevice.getPropertyPostTopic();
                             HashMap mapSP = gson.fromJson(argss[1], HashMap.class);
                             SendJsonInfo sendJsonInfoSP = new SendJsonInfo();
                             sendJsonInfoSP.setParams(mapSP);

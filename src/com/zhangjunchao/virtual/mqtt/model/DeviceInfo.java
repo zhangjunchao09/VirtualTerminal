@@ -5,6 +5,10 @@ public class DeviceInfo {
     String productId;
     String secret;
 
+    public String getPropertyPostTopic() {
+        return String.format("/sys/%s/%s/thing/event/property/post", productId, deviceId);
+    }
+
     public String getDeviceId() {
         return deviceId;
     }

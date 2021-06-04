@@ -3,7 +3,7 @@ package com.zhangjunchao.virtual.mqtt.model;
 public class ChildDeviceLoginInfo {
     private String id = "123";
     private String version = "1.0";
-    private Params params;
+    private LoginParams params;
 
     public String getId() {
         return id;
@@ -21,11 +21,11 @@ public class ChildDeviceLoginInfo {
         this.version = version;
     }
 
-    public Params getParams() {
+    public LoginParams getParams() {
         return params;
     }
 
-    public void setParams(Params params) {
+    public void setParams(LoginParams params) {
         this.params = params;
     }
 }

@@ -4,8 +4,8 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.zhangjunchao.virtual.mqtt.model.ChildDeviceLoginInfo;
 import com.zhangjunchao.virtual.mqtt.model.DeviceInfo;
-import com.zhangjunchao.virtual.mqtt.model.LoginInfo;
-import com.zhangjunchao.virtual.mqtt.model.Params;
+import com.zhangjunchao.virtual.mqtt.model.SignInfo;
+import com.zhangjunchao.virtual.mqtt.model.LoginParams;
 import com.zhangjunchao.virtual.mqtt.utils.Signature;
 import org.eclipse.paho.client.mqttv3.*;
 import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
@@ -39,18 +39,18 @@ public class McListener {
 
             String login_reply_topic = String.format("/ext/session/%s/%s/combine/login_reply", productId, deviceId);
             String property_set_topic = String.format("/sys/%s/%s/thing/service/property/set", productId, deviceId);
-            LoginInfo loginInfoParent = Signature.mqttInfo(deviceId, productId, secret);
+            SignInfo signInfoParent = Signature.mqttInfo(deviceId, productId, secret);
 
             // HOST_MQ为主机名，clientid即连接MQTT的客户端ID，一般以唯一标识符表示，MemoryPersistence设置clientid的保存形式，
-            client_sub = new MqttClient(host, loginInfoParent.getClientId(), new MemoryPersistence());
+            client_sub = new MqttClient(host, signInfoParent.getClientId(), new MemoryPersistence());
             // MQTT的连接设置
             options_sub = new MqttConnectOptions();
             // 设置是否清空session,这里如果设置为false表示服务器会保留客户端的连接记录，设置为true表示每次连接到服务器都以新的身份连接
             options_sub.setCleanSession(false);
             // 设置连接的用户名
-            options_sub.setUserName(loginInfoParent.getUserName());
+            options_sub.setUserName(signInfoParent.getUserName());
             // 设置连接的密码
-            options_sub.setPassword(loginInfoParent.getPassword().toCharArray());
+            options_sub.setPassword(signInfoParent.getPassword().toCharArray());
             // 设置会话心跳时间 单位为秒 服务器会每隔90秒的时间向客户端发送个消息判断客户端是否在线，但这个方法并没有重连的机制
             options_sub.setKeepAliveInterval(90);
             //订阅topic定义
@@ -112,13 +112,13 @@ public class McListener {
     public void childDeviceLogin(DeviceInfo childDevice) {
         String login_topic = String.format("/ext/session/%s/%s/combine/login", parentDevice.getProductId(), parentDevice.getDeviceId());
 
-        LoginInfo loginInfoChildren = Signature.mqttInfo(childDevice.getDeviceId(), childDevice.getProductId(), childDevice.getSecret());
-        Params params = new Params();
+        SignInfo signInfoChildren = Signature.mqttInfo(childDevice.getDeviceId(), childDevice.getProductId(), childDevice.getSecret());
+        LoginParams params = new LoginParams();
         params.setDeviceId(childDevice.getDeviceId());
         params.setProductId(childDevice.getProductId());
-        params.setClientId(loginInfoChildren.getClientId());
-        params.setSign(loginInfoChildren.getPassword());
-        params.setTimestamp(loginInfoChildren.getTimestamp());
+        params.setClientId(signInfoChildren.getClientId());
+        params.setSign(signInfoChildren.getPassword());
+        params.setTimestamp(signInfoChildren.getTimestamp());
 
         ChildDeviceLoginInfo childDeviceLoginInfo = new ChildDeviceLoginInfo();
         childDeviceLoginInfo.setParams(params);

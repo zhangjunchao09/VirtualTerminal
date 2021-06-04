@@ -1,6 +1,6 @@
 package com.zhangjunchao.virtual.mqtt.model;
 
-public class Params {
+public class LoginParams {
     private String productId;
     private String deviceId;
     private String clientId;

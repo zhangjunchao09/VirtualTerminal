@@ -1,6 +1,6 @@
 package com.zhangjunchao.virtual.mqtt.model;
 
-public class LoginInfo {
+public class SignInfo {
     String clientId;
     String userName;
     String password;

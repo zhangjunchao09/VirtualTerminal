@@ -1,6 +1,6 @@
 package com.zhangjunchao.virtual.mqtt.utils;
 
-import com.zhangjunchao.virtual.mqtt.model.LoginInfo;
+import com.zhangjunchao.virtual.mqtt.model.SignInfo;
 
 import javax.crypto.Mac;
 import javax.crypto.SecretKey;
@@ -50,7 +50,7 @@ public class Signature {
         return sb.toString();
     }
 
-    public static LoginInfo mqttInfo(String devcieId, String productId, String secret) {
+    public static SignInfo mqttInfo(String devcieId, String productId, String secret) {
 
         long time = new Date().getTime();
         String clientId = String.format("%s&%s", devcieId, productId);
@@ -58,28 +58,28 @@ public class Signature {
         String content = String.format("deviceId=%s&productId=%s&timestamp=%s", devcieId, productId, time);
         String password = encrypt(secret, content);
 
-        LoginInfo loginInfo = new LoginInfo();
-        loginInfo.setClientId(clientId);
-        loginInfo.setUserName(userName);
-        loginInfo.setPassword(password.toLowerCase());
-        loginInfo.setTimestamp(time + "");
-        return loginInfo;
+        SignInfo signInfo = new SignInfo();
+        signInfo.setClientId(clientId);
+        signInfo.setUserName(userName);
+        signInfo.setPassword(password.toLowerCase());
+        signInfo.setTimestamp(time + "");
+        return signInfo;
     }
 
     public static void main(String[] args) {
 
-        LoginInfo loginInfoParent = mqttInfo("20210603001", "SA66EhKg", "LSS9x6M1ctVcha36");
+        SignInfo signInfoParent = mqttInfo("20210603001", "SA66EhKg", "LSS9x6M1ctVcha36");
 
-        System.out.println(loginInfoParent.getClientId());
-        System.out.println(loginInfoParent.getUserName());
-        System.out.println(loginInfoParent.getPassword());
+        System.out.println(signInfoParent.getClientId());
+        System.out.println(signInfoParent.getUserName());
+        System.out.println(signInfoParent.getPassword());
 
         System.out.println("===========================");
 
-        LoginInfo loginInfoChildren = mqttInfo("LJF20210519ZS002", "3sXd1Ojd", "5F1Vb9LqN1hIg0nt");
+        SignInfo signInfoChildren = mqttInfo("LJF20210519ZS002", "3sXd1Ojd", "5F1Vb9LqN1hIg0nt");
 
-        System.out.println(loginInfoChildren.getClientId());
-        System.out.println(loginInfoChildren.getUserName());
-        System.out.println(loginInfoChildren.getPassword());
+        System.out.println(signInfoChildren.getClientId());
+        System.out.println(signInfoChildren.getUserName());
+        System.out.println(signInfoChildren.getPassword());
     }
 }
