@@ -4,7 +4,8 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 
-import static java.lang.Thread.sleep;
+import java.util.HashMap;
+import java.util.Scanner;
 
 public class Client {
 
@@ -38,15 +39,46 @@ public class Client {
         MqttMessage msg_pub = new MqttMessage(loginJSON.getBytes());
         msg_pub.setQos(0);
 
-        System.out.println("=======准备发送Topic：{}========" + login_topic);
-        System.out.println("=======准备发送Message：{}========" + loginJSON);
         try {
             McListener mcListener = new McListener(host, deviceId, productId, secret);
             mcListener.initMQTTListener();
             mcListener.publish(login_topic, msg_pub);
 
+            String child_property_set_topic = String.format("/sys/%s/%s/thing/service/property/set", childProductId, childDeviceId);
+            mcListener.subscribe(child_property_set_topic, 0);
+            Scanner scanner = new Scanner(System.in);
+
             while (true) {
-                sleep(1000);
+                String position = scanner.nextLine();  // -sc json
+                try {
+                    String[] argss = position.trim().split("\\|");
+                    String opt = argss[0];
+                    switch (opt) {
+                        case "-sc":
+                            String topicSC = String.format("/sys/%s/%s/thing/event/property/post", childProductId, childDeviceId);
+                            HashMap mapSC = gson.fromJson(argss[1], HashMap.class);
+                            SendJsonInfo sendJsonInfoSC = new SendJsonInfo();
+                            sendJsonInfoSC.setParams(mapSC);
+                            MqttMessage content = new MqttMessage(gson.toJson(sendJsonInfoSC).getBytes());
+                            content.setQos(0);
+                            mcListener.publish(topicSC, content);
+                            break;
+                        case "-sp":
+                            String topicSP = String.format("/sys/%s/%s/thing/service/property/post", productId, deviceId);
+                            HashMap mapSP = gson.fromJson(argss[1], HashMap.class);
+                            SendJsonInfo sendJsonInfoSP = new SendJsonInfo();
+                            sendJsonInfoSP.setParams(mapSP);
+                            MqttMessage contentSP = new MqttMessage(gson.toJson(sendJsonInfoSP).getBytes());
+                            contentSP.setQos(0);
+                            mcListener.publish(topicSP, contentSP);
+                            break;
+                        default:
+
+                    }
+                } catch (Exception e) {
+                    System.out.println(e);
+                }
+
             }
         } catch (Exception e) {
             System.err.println("=======发布主题消息失败：topic: {}=========" + login_topic);

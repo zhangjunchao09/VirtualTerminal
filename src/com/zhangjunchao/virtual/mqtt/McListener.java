@@ -23,6 +23,7 @@ public class McListener {
     public void initMQTTListener() {
         try {
             String login_reply_topic = String.format("/ext/session/%s/%s/combine/login_reply", productId, deviceId);
+            String property_set_topic = String.format("/sys/%s/%s/thing/service/property/set", productId, deviceId);
             LoginInfo loginInfoParent = Signature.mqttInfo(deviceId, productId, secret);
 
             // HOST_MQ为主机名，clientid即连接MQTT的客户端ID，一般以唯一标识符表示，MemoryPersistence设置clientid的保存形式，
@@ -38,8 +39,8 @@ public class McListener {
             // 设置会话心跳时间 单位为秒 服务器会每隔90秒的时间向客户端发送个消息判断客户端是否在线，但这个方法并没有重连的机制
             options_sub.setKeepAliveInterval(90);
             //订阅topic定义
-            int[] Qos = new int[]{0};
-            String[] topics = new String[]{login_reply_topic};
+            int[] Qos = new int[]{0, 0};
+            String[] topics = new String[]{login_reply_topic, property_set_topic};
 
             // 设置回调
             client_sub.setCallback(new MqttCallbackExtended() {
@@ -47,7 +48,6 @@ public class McListener {
                     //连接成功，需要上传客户端所有的订阅关系
                     try {
                         client_sub.subscribe(topics, Qos);
-                        System.out.println("=======连接MQTT HOST 成功,重发Topics 1{}=2{}=3{}=======" + login_reply_topic);
                     } catch (Exception e) {
                         System.err.println("=======重连MQTT HOST 失败: {}, case: {}=========" + serverURI + e.toString());
                     }
@@ -94,8 +94,39 @@ public class McListener {
         }
     }
 
+    public void subscribe(String topic, int qos) throws MqttException {
+        this.client_sub.subscribe(topic, qos);
+    }
+
     public void publish(String topic, MqttMessage message) throws MqttException {
         this.client_sub.publish(topic, message.getPayload(), 1, true);
     }
 
+    public MqttClient getClient_sub() {
+        return client_sub;
+    }
+
+    public String getDeviceId() {
+        return deviceId;
+    }
+
+    public void setDeviceId(String deviceId) {
+        this.deviceId = deviceId;
+    }
+
+    public String getProductId() {
+        return productId;
+    }
+
+    public void setProductId(String productId) {
+        this.productId = productId;
+    }
+
+    public String getSecret() {
+        return secret;
+    }
+
+    public void setSecret(String secret) {
+        this.secret = secret;
+    }
 }
