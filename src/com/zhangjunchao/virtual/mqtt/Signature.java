@@ -6,6 +6,7 @@ import javax.crypto.spec.SecretKeySpec;
 import java.nio.charset.Charset;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
+import java.util.Date;
 
 public class Signature {
 
@@ -47,23 +48,36 @@ public class Signature {
         return sb.toString();
     }
 
-    public static void mqttInfo(String devcieId, String productId, String secret, String time) {
+    public static LoginInfo mqttInfo(String devcieId, String productId, String secret) {
 
+        long time = new Date().getTime();
         String clientId = String.format("%s&%s", devcieId, productId);
-        String username = String.format("%s{timestamp=%s,signmethod=hmacsha1}", devcieId, time);
+        String userName = String.format("%s{timestamp=%s,signmethod=hmacsha1}", devcieId, time);
         String content = String.format("deviceId=%s&productId=%s&timestamp=%s", devcieId, productId, time);
         String password = encrypt(secret, content);
 
-        System.out.println(clientId);
-        System.out.println(username);
-        System.out.println(content);
-        System.out.println(password.toLowerCase());
-        System.out.println("===========================");
+        LoginInfo loginInfo = new LoginInfo();
+        loginInfo.setClientId(clientId);
+        loginInfo.setUserName(userName);
+        loginInfo.setPassword(password.toLowerCase());
+        loginInfo.setTimestamp(time + "");
+        return loginInfo;
     }
 
     public static void main(String[] args) {
-        mqttInfo("zvos", "test", "ABCD1234", "1571047235");
 
-        mqttInfo("lgctestes", "NcZ62Ge5", "3ObGhRF3Xua2VHkyRcsVeTdQ6WjMIEkK", "1571047235");
+        LoginInfo loginInfoParent = mqttInfo("20210603001", "SA66EhKg", "LSS9x6M1ctVcha36");
+
+        System.out.println(loginInfoParent.getClientId());
+        System.out.println(loginInfoParent.getUserName());
+        System.out.println(loginInfoParent.getPassword());
+
+        System.out.println("===========================");
+
+        LoginInfo loginInfoChildren = mqttInfo("LJF20210519ZS002", "3sXd1Ojd", "5F1Vb9LqN1hIg0nt");
+
+        System.out.println(loginInfoChildren.getClientId());
+        System.out.println(loginInfoChildren.getUserName());
+        System.out.println(loginInfoChildren.getPassword());
     }
 }
