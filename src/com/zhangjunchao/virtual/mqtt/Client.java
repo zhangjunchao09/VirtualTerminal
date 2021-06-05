@@ -1,10 +1,11 @@
 package com.zhangjunchao.virtual.mqtt;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
+import com.google.gson.JsonObject;
+import com.google.gson.reflect.TypeToken;
 import com.zhangjunchao.virtual.mqtt.listener.McListener;
 import com.zhangjunchao.virtual.mqtt.model.DeviceInfo;
 import com.zhangjunchao.virtual.mqtt.model.SendJsonInfo;
+import com.zhangjunchao.virtual.utils.GsonUtils;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 
 import java.util.HashMap;
@@ -20,9 +21,6 @@ public class Client {
     private static String childDeviceId = "20210603009";
     private static String childProductId = "AFIeiEN7";
     private static String childSecret = "kdBR57zfjmoNnFz6";
-
-    private static final Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
-
 
     public static void main(String[] args) {
 
@@ -55,19 +53,21 @@ public class Client {
                     switch (opt) {
                         case "-sc":
                             String topicSC = childDevice.getPropertyPostTopic();
-                            HashMap mapSC = gson.fromJson(argss[1], HashMap.class);
+                            HashMap<String, JsonObject> mapSC = GsonUtils.mapFromJson(argss[1], new TypeToken<HashMap<String, JsonObject>>() {
+                            });
                             SendJsonInfo sendJsonInfoSC = new SendJsonInfo();
                             sendJsonInfoSC.setParams(mapSC);
-                            MqttMessage content = new MqttMessage(gson.toJson(sendJsonInfoSC).getBytes());
+                            MqttMessage content = new MqttMessage(GsonUtils.toJson(sendJsonInfoSC, false).getBytes());
                             content.setQos(0);
                             mcListener.publish(topicSC, content);
                             break;
                         case "-sp":
                             String topicSP = parentDevice.getPropertyPostTopic();
-                            HashMap mapSP = gson.fromJson(argss[1], HashMap.class);
+                            HashMap<String, JsonObject> mapSP = GsonUtils.mapFromJson(argss[1], new TypeToken<HashMap<String, JsonObject>>() {
+                            });
                             SendJsonInfo sendJsonInfoSP = new SendJsonInfo();
                             sendJsonInfoSP.setParams(mapSP);
-                            MqttMessage contentSP = new MqttMessage(gson.toJson(sendJsonInfoSP).getBytes());
+                            MqttMessage contentSP = new MqttMessage(GsonUtils.toJson(sendJsonInfoSP, false).getBytes());
                             contentSP.setQos(0);
                             mcListener.publish(topicSP, contentSP);
                             break;
