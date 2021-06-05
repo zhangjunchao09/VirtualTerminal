@@ -1,20 +1,22 @@
 package com.zhangjunchao.virtual.mqtt.listener;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.zhangjunchao.virtual.mqtt.model.ChildDeviceLoginInfo;
 import com.zhangjunchao.virtual.mqtt.model.DeviceInfo;
-import com.zhangjunchao.virtual.mqtt.model.SignInfo;
 import com.zhangjunchao.virtual.mqtt.model.LoginParams;
+import com.zhangjunchao.virtual.mqtt.model.SignInfo;
 import com.zhangjunchao.virtual.mqtt.utils.Signature;
-import org.eclipse.paho.client.mqttv3.*;
+import com.zhangjunchao.virtual.utils.GsonUtils;
+import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
+import org.eclipse.paho.client.mqttv3.MqttCallbackExtended;
+import org.eclipse.paho.client.mqttv3.MqttClient;
+import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
+import org.eclipse.paho.client.mqttv3.MqttException;
+import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
 
 import java.util.List;
 
 public class McListener {
-
-    private static final Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
 
     private String host;
 
@@ -122,7 +124,7 @@ public class McListener {
 
         ChildDeviceLoginInfo childDeviceLoginInfo = new ChildDeviceLoginInfo();
         childDeviceLoginInfo.setParams(params);
-        String loginJSON = gson.toJson(childDeviceLoginInfo);
+        String loginJSON = GsonUtils.toJson(childDeviceLoginInfo, false);
         MqttMessage msg_pub = new MqttMessage(loginJSON.getBytes());
         msg_pub.setQos(0);
         try {
