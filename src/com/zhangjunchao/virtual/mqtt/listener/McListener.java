@@ -14,6 +14,7 @@ import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
 
+import java.util.HashMap;
 import java.util.List;
 
 public class McListener {
@@ -22,7 +23,7 @@ public class McListener {
 
     private DeviceInfo parentDevice;
 
-    private List<DeviceInfo> childDevices;
+    private HashMap<String, DeviceInfo> childDevices;
 
     private MqttClient client_sub;
     private MqttConnectOptions options_sub;
@@ -39,8 +40,9 @@ public class McListener {
             String productId = parentDevice.getProductId();
             String secret = parentDevice.getSecret();
 
-            String login_reply_topic = String.format("/ext/session/%s/%s/combine/login_reply", productId, deviceId);
-            String property_set_topic = String.format("/sys/%s/%s/thing/service/property/set", productId, deviceId);
+            String login_reply_topic = parentDevice.getLoginReplySubscribeTopic();
+            String property_set_topic = parentDevice.getPropertySubscribeTopic();
+
             SignInfo signInfoParent = Signature.mqttInfo(deviceId, productId, secret);
 
             // HOST_MQ为主机名，clientid即连接MQTT的客户端ID，一般以唯一标识符表示，MemoryPersistence设置clientid的保存形式，
@@ -129,12 +131,12 @@ public class McListener {
         msg_pub.setQos(0);
         try {
             publish(login_topic, msg_pub);
+            childDevices.put(childDevice.getDeviceId(), childDevice);
 
-            String child_property_set_topic = String.format("/sys/%s/%s/thing/service/property/set", childDevice.getProductId(), childDevice.getDeviceId());
-            subscribe(child_property_set_topic, 0);
+            subscribe(childDevice.getPropertySubscribeTopic(), 0);
 
         } catch (MqttException e) {
-            System.err.println("=======发布主题消息失败：topic: {}=========" + login_topic);
+            System.err.println("=======登陆子设备/订阅子设备属性设置topic异常" + e.toString());
         }
     }
 
@@ -158,11 +160,11 @@ public class McListener {
         this.parentDevice = parentDevice;
     }
 
-    public List<DeviceInfo> getChildDevices() {
+    public HashMap<String, DeviceInfo> getChildDevices() {
         return childDevices;
     }
 
-    public void setChildDevices(List<DeviceInfo> childDevices) {
+    public void setChildDevices(HashMap<String, DeviceInfo> childDevices) {
         this.childDevices = childDevices;
     }
 }

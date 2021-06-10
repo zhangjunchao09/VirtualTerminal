@@ -9,6 +9,14 @@ public class DeviceInfo {
         return String.format("/sys/%s/%s/thing/event/property/post", productId, deviceId);
     }
 
+    public String getPropertySubscribeTopic() {
+        return String.format("/sys/%s/%s/thing/service/property/set", productId, deviceId);
+    }
+
+    public String getLoginReplySubscribeTopic() {
+        return String.format("/ext/session/%s/%s/combine/login_reply", productId, deviceId);
+    }
+
     public String getDeviceId() {
         return deviceId;
     }

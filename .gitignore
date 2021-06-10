@@ -21,3 +21,4 @@ aixforce-search/data
 db/
 *.versionsBackup
 .svn/
+/out/production/VirtualTerminal/META-INF/VirtualTerminal.kotlin_module

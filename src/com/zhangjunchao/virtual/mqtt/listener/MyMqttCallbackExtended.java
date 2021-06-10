@@ -8,13 +8,6 @@ public class MyMqttCallbackExtended implements MqttCallbackExtended {
 
     McListener mcListener;
 
-    String login_reply_topic = String.format("/ext/session/%s/%s/combine/login_reply", mcListener.getParentDevice().getProductId(), mcListener.getParentDevice().getDeviceId());
-    String property_set_topic = String.format("/sys/%s/%s/thing/service/property/set", mcListener.getParentDevice().getProductId(), mcListener.getParentDevice().getDeviceId());
-
-    //订阅topic定义
-    int[] Qos = new int[]{0, 0};
-    String[] topics = new String[]{login_reply_topic, property_set_topic};
-
     public MyMqttCallbackExtended(McListener mcListener) {
         this.mcListener = mcListener;
     }
@@ -22,6 +15,11 @@ public class MyMqttCallbackExtended implements MqttCallbackExtended {
     public void connectComplete(boolean reconnect, String serverURI) {
         //连接成功，需要上传客户端所有的订阅关系
         try {
+            String login_reply_topic = mcListener.getParentDevice().getLoginReplySubscribeTopic();
+            String property_set_topic = mcListener.getParentDevice().getPropertySubscribeTopic();
+            String[] topics = new String[]{login_reply_topic, property_set_topic};
+            //订阅topic定义
+            int[] Qos = new int[]{0, 0};
             mcListener.getClient_sub().subscribe(topics, Qos);
         } catch (Exception e) {
             System.err.println("=======重连MQTT HOST 失败: {}, case: {}=========" + serverURI + e.toString());
