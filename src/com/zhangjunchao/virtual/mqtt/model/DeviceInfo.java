@@ -13,6 +13,10 @@ public class DeviceInfo {
         return String.format("/sys/%s/%s/thing/service/property/set", productId, deviceId);
     }
 
+    public String getLoginTopic() {
+        return String.format("/ext/session/%s/%s/combine/login", productId, deviceId);
+    }
+
     public String getLoginReplySubscribeTopic() {
         return String.format("/ext/session/%s/%s/combine/login_reply", productId, deviceId);
     }

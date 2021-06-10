@@ -81,6 +81,7 @@ public class Client {
             }
         } catch (Exception e) {
             System.err.println("=======发布主题消息失败：topic: {}=========");
+            System.err.println(e);
         }
     }
 

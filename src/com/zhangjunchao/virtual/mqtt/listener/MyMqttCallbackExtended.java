@@ -22,22 +22,22 @@ public class MyMqttCallbackExtended implements MqttCallbackExtended {
             int[] Qos = new int[]{0, 0};
             mcListener.getClient_sub().subscribe(topics, Qos);
         } catch (Exception e) {
-            System.err.println("=======重连MQTT HOST 失败: {}, case: {}=========" + serverURI + e.toString());
+            System.err.println("=======重连MQTT HOST 失败: {}, case: {}=========" + serverURI);
+            System.err.println(e);
         }
     }
 
     public void connectionLost(Throwable cause) {
         // 连接丢失后，一般在这里面进行重连
         System.err.println("=======连接断开，可以做重连==============");
-        // reConnect();
+        mcListener.reConnect();
     }
 
     public void deliveryComplete(IMqttDeliveryToken token) {
-        System.err.println("=======交付完成: {}==============" + token.isComplete());
+        System.out.println("=======交付完成: {}==============" + token.isComplete());
     }
 
     public void messageArrived(String topic, MqttMessage message) {
-        //due arrived message...
         System.out.println("=======收到消息topic: {}===Qos: {}" + topic + message.getQos());
         System.out.println("=======message: {}" + message.toString());
     }

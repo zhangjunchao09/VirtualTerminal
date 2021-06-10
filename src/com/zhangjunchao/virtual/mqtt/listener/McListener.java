@@ -6,8 +6,6 @@ import com.zhangjunchao.virtual.mqtt.model.LoginParams;
 import com.zhangjunchao.virtual.mqtt.model.SignInfo;
 import com.zhangjunchao.virtual.mqtt.utils.Signature;
 import com.zhangjunchao.virtual.utils.GsonUtils;
-import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
-import org.eclipse.paho.client.mqttv3.MqttCallbackExtended;
 import org.eclipse.paho.client.mqttv3.MqttClient;
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 import org.eclipse.paho.client.mqttv3.MqttException;
@@ -15,7 +13,6 @@ import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
 
 import java.util.HashMap;
-import java.util.List;
 
 public class McListener {
 
@@ -23,7 +20,7 @@ public class McListener {
 
     private DeviceInfo parentDevice;
 
-    private HashMap<String, DeviceInfo> childDevices;
+    private HashMap<String, DeviceInfo> childDevices = new HashMap<>();
 
     private MqttClient client_sub;
     private MqttConnectOptions options_sub;
@@ -62,32 +59,7 @@ public class McListener {
             String[] topics = new String[]{login_reply_topic, property_set_topic};
 
             // 设置回调
-            client_sub.setCallback(new MqttCallbackExtended() {
-                public void connectComplete(boolean reconnect, String serverURI) {
-                    //连接成功，需要上传客户端所有的订阅关系
-                    try {
-                        client_sub.subscribe(topics, Qos);
-                    } catch (Exception e) {
-                        System.err.println("=======重连MQTT HOST 失败: {}, case: {}=========" + serverURI + e.toString());
-                    }
-                }
-
-                public void connectionLost(Throwable cause) {
-                    // 连接丢失后，一般在这里面进行重连
-                    System.err.println("=======连接断开，可以做重连==============");
-                    // reConnect();
-                }
-
-                public void deliveryComplete(IMqttDeliveryToken token) {
-                    System.err.println("=======交付完成: {}==============" + token.isComplete());
-                }
-
-                public void messageArrived(String topic, MqttMessage message) {
-                    //due arrived message...
-                    System.out.println("=======收到消息topic: {}===Qos: {}" + topic + message.getQos());
-                    System.out.println("=======message: {}" + message.toString());
-                }
-            });
+            client_sub.setCallback(new MyMqttCallbackExtended(this));
             //连接mqtt服务器broker
             client_sub.connect(options_sub);
             //订阅消息
@@ -114,7 +86,8 @@ public class McListener {
     }
 
     public void childDeviceLogin(DeviceInfo childDevice) {
-        String login_topic = String.format("/ext/session/%s/%s/combine/login", parentDevice.getProductId(), parentDevice.getDeviceId());
+
+        String login_topic = parentDevice.getLoginTopic();
 
         SignInfo signInfoChildren = Signature.mqttInfo(childDevice.getDeviceId(), childDevice.getProductId(), childDevice.getSecret());
         LoginParams params = new LoginParams();
