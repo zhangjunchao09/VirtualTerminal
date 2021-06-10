@@ -121,6 +121,18 @@ public class McListener {
         this.client_sub.publish(topic, message.getPayload(), 1, true);
     }
 
+    public void publish(String topic, String message) throws MqttException {
+        MqttMessage content = new MqttMessage(message.getBytes());
+        content.setQos(0);
+        this.client_sub.publish(topic, content.getPayload(), 1, true);
+    }
+
+    public void publish(String topic, Object obj) throws MqttException {
+        MqttMessage content = new MqttMessage(GsonUtils.toJson(obj, false).getBytes());
+        content.setQos(0);
+        this.client_sub.publish(topic, content.getPayload(), 1, true);
+    }
+
     public MqttClient getClient_sub() {
         return client_sub;
     }

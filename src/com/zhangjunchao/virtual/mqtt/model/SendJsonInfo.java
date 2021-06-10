@@ -2,16 +2,16 @@ package com.zhangjunchao.virtual.mqtt.model;
 
 import java.util.HashMap;
 
-public class SendJsonInfo {
-    private String id = "123";
+public class SendJsonInfo<T> {
+    private long id = 123;
     private String version = "1.0";
-    private HashMap params;
+    private HashMap<String, T> params = new HashMap();
 
-    public String getId() {
+    public long getId() {
         return id;
     }
 
-    public void setId(String id) {
+    public void setId(long id) {
         this.id = id;
     }
 
