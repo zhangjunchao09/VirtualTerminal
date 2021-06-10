@@ -3,7 +3,9 @@ package com.zhangjunchao.virtual.mqtt.listener;
 import com.zhangjunchao.virtual.mqtt.model.ChildDeviceLoginInfo;
 import com.zhangjunchao.virtual.mqtt.model.DeviceInfo;
 import com.zhangjunchao.virtual.mqtt.model.LoginParams;
+import com.zhangjunchao.virtual.mqtt.model.SendJsonInfo;
 import com.zhangjunchao.virtual.mqtt.model.SignInfo;
+import com.zhangjunchao.virtual.mqtt.utils.DateUtil;
 import com.zhangjunchao.virtual.mqtt.utils.Signature;
 import com.zhangjunchao.virtual.utils.GsonUtils;
 import org.eclipse.paho.client.mqttv3.MqttClient;
@@ -13,6 +15,7 @@ import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
 
 import java.util.HashMap;
+import java.util.Map;
 
 public class McListener {
 
@@ -113,8 +116,37 @@ public class McListener {
         }
     }
 
+    public DeviceInfo getDevice(String deviceId) {
+        if (deviceId.equals(parentDevice.getDeviceId())) {
+            return parentDevice;
+        } else {
+            return childDevices.get(deviceId);
+        }
+
+    }
+
     public void subscribe(String topic, int qos) throws MqttException {
         this.client_sub.subscribe(topic, qos);
+    }
+
+    public void postProperty(String deviceId, Map<String, Object> params) throws MqttException {
+
+        DeviceInfo deviceInfo = this.getDevice(deviceId);
+        if (deviceInfo != null) {
+            HashMap<String, HashMap<String, Object>> send = new HashMap<>();
+            String time = DateUtil.getCurrentTimeStr();
+            for (String key : params.keySet()) {
+                HashMap<String, Object> keyMap = new HashMap<>();
+                keyMap.put("value", params.get(key));
+                keyMap.put("time", time);
+                send.put(key, keyMap);
+            }
+            SendJsonInfo<HashMap<String, Object>> sendJsonInfoSC = new SendJsonInfo();
+            sendJsonInfoSC.setParams(send);
+            MqttMessage content = new MqttMessage(GsonUtils.toJson(sendJsonInfoSC, false).getBytes());
+            content.setQos(0);
+            this.publish(deviceInfo.getPropertyPostTopic(), content);
+        }
     }
 
     public void publish(String topic, MqttMessage message) throws MqttException {

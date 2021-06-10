@@ -53,12 +53,7 @@ public class MyMqttCallbackExtended implements MqttCallbackExtended {
 
         if (topic.contains("thing/service/property/set")) {
             String deviceId = TopicToDeviceId.propertySetTopicToDeviceId(topic);
-            DeviceInfo deviceInfo;
-            if (deviceId.equals(mcListener.getParentDevice().getDeviceId())) {
-                deviceInfo = mcListener.getParentDevice();
-            } else {
-                deviceInfo = mcListener.getChildDevices().get(deviceId);
-            }
+            DeviceInfo deviceInfo = mcListener.getDevice(deviceId);
             if (deviceInfo != null) {
                 try {
                     String receiveJson = message.toString();
@@ -69,7 +64,6 @@ public class MyMqttCallbackExtended implements MqttCallbackExtended {
                     mcListener.publish(deviceInfo.getPropertyReplySubscribeTopic(), res);
 
                     JsonObject jsonObject = (JsonObject) receive.get("params");
-
 
                     DeviceProperty deviceProperty = new DeviceProperty();
                     for (String key : jsonObject.keySet()) {
