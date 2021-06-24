@@ -2,6 +2,7 @@ package com.zhangjunchao.virtual.mqtt.listener;
 
 import com.zhangjunchao.virtual.mqtt.model.ChildDeviceLoginInfo;
 import com.zhangjunchao.virtual.mqtt.model.DeviceInfo;
+import com.zhangjunchao.virtual.mqtt.model.DeviceProperty;
 import com.zhangjunchao.virtual.mqtt.model.LoginParams;
 import com.zhangjunchao.virtual.mqtt.model.SendJsonInfo;
 import com.zhangjunchao.virtual.mqtt.model.SignInfo;
@@ -14,7 +15,9 @@ import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class McListener {
@@ -141,6 +144,7 @@ public class McListener {
                 keyMap.put("time", time);
                 send.put(key, keyMap);
             }
+            setProperty(deviceId, send);
             SendJsonInfo<HashMap<String, Object>> sendJsonInfoSC = new SendJsonInfo();
             sendJsonInfoSC.setParams(send);
             MqttMessage content = new MqttMessage(GsonUtils.toJson(sendJsonInfoSC, false).getBytes());
@@ -148,6 +152,21 @@ public class McListener {
             this.publish(deviceInfo.getPropertyPostTopic(), content);
         }
     }
+
+    public void setProperty(String deviceId, HashMap<String, HashMap<String, Object>> send) {
+        send.forEach((s, m) -> {
+            try {
+                DeviceProperty deviceProperty = new DeviceProperty();
+                deviceProperty.setKey(s);
+                deviceProperty.setValue(m.get("value").toString());
+                deviceProperty.setTime(DateUtil.getCurrentTimeStr());
+                getDevice(deviceId).setProperty(deviceProperty);
+            } catch (Exception e) {
+                System.out.println(e);
+            }
+        });
+    }
+
 
     public void publish(String topic, MqttMessage message) throws MqttException {
         this.client_sub.publish(topic, message.getPayload(), 1, true);

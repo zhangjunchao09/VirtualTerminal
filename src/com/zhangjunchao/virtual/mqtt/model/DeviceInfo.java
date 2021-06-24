@@ -60,4 +60,12 @@ public class DeviceInfo {
     public void setSecret(String secret) {
         this.secret = secret;
     }
+
+    public HashMap<String, DeviceProperty> getProperties() {
+        return properties;
+    }
+
+    public void setProperties(HashMap<String, DeviceProperty> properties) {
+        this.properties = properties;
+    }
 }

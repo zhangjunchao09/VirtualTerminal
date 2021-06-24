@@ -3,6 +3,7 @@ package com.zhangjunchao.virtual.mqtt;
 import com.google.gson.reflect.TypeToken;
 import com.zhangjunchao.virtual.mqtt.listener.McListener;
 import com.zhangjunchao.virtual.mqtt.model.DeviceInfo;
+import com.zhangjunchao.virtual.mqtt.thread.PropertySendJob;
 import com.zhangjunchao.virtual.utils.GsonUtils;
 
 import java.util.Map;
@@ -40,10 +41,12 @@ public class Client {
             //子设备上线 订阅子设备topic
             mcListener.childDeviceLogin(childDevice);
 
+            new PropertySendJob(mcListener).start();
+
             Scanner scanner = new Scanner(System.in);
 
             while (true) {
-                String position = scanner.nextLine();  // -sc json
+                String position = scanner.nextLine();
                 try {
                     String[] argss = position.trim().split("\\s+");
                     String opt = argss[0];

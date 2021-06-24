@@ -110,6 +110,7 @@ public class MyMqttCallbackExtended implements MqttCallbackExtended {
                         params.put(deviceProperty.getKey(), deviceProperty);
                     }
                     SendJsonInfo<DeviceProperty> postProperty = new SendJsonInfo<>();
+                    postProperty.setId(id);
                     postProperty.setParams(params);
 
                     mcListener.publish(deviceInfo.getPropertyPostTopic(), postProperty);
