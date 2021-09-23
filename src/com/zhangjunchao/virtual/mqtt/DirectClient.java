@@ -9,16 +9,13 @@ import com.zhangjunchao.virtual.utils.GsonUtils;
 import java.util.Map;
 import java.util.Scanner;
 
-public class Client {
+public class DirectClient {
 
     private static String host = "tcp://10.39.52.191:1883";
-    private static String deviceId = "20210603001";
-    private static String productId = "SA66EhKg";
-    private static String secret = "LSS9x6M1ctVcha36";
+    private static String deviceId = "1111111114444";
+    private static String productId = "xZQ6vOjr";
+    private static String secret = "S7K82dZMHBfZficg";
 
-    private static String childDeviceId = "20210603009";
-    private static String childProductId = "AFIeiEN7";
-    private static String childSecret = "kdBR57zfjmoNnFz6";
 
     public static void main(String[] args) {
 
@@ -30,16 +27,8 @@ public class Client {
 
             McListener mcListener = new McListener(host, parentDevice);
 
-            // 父设备上线　订阅登陆回复topic
             mcListener.initMQTTListener(2);
 
-            DeviceInfo childDevice = new DeviceInfo();
-            childDevice.setDeviceId(childDeviceId);
-            childDevice.setProductId(childProductId);
-            childDevice.setSecret(childSecret);
-
-            //子设备上线 订阅子设备topic
-            mcListener.childDeviceLogin(childDevice);
 
             new PropertySendJob(mcListener).start();
 
@@ -50,19 +39,19 @@ public class Client {
                 try {
                     String[] argss = position.trim().split("\\s+");
                     String opt = argss[0];
+                    String deviceId;
                     switch (opt) {
-                        case "-sp":
-                            String deviceId = argss[1];
-                            Map<String, Object> map = GsonUtils.mapFromJson(argss[2], new TypeToken<Map<String, Object>>() {
-                            });
-                            mcListener.postProperty(deviceId, map);
+                        case "-df":
+                            deviceId = argss[1];
+                            mcListener.postDeviceInform(deviceId, argss[2]);
                             break;
-                        case "-ac":
-                            DeviceInfo deviceInfo = new DeviceInfo();
-                            deviceInfo.setDeviceId(argss[1]);
-                            deviceInfo.setProductId(argss[2]);
-                            deviceInfo.setSecret(argss[3]);
-                            mcListener.childDeviceLogin(deviceInfo);
+                        case "-dp":
+                            deviceId = argss[1];
+                            mcListener.postDeviceUpgradeProgress(deviceId, argss[2]);
+                            break;
+                        case "-dr":
+                            deviceId = argss[1];
+                            mcListener.postDeviceUpgradeResult(deviceId, argss[2]);
                             break;
                         default:
 

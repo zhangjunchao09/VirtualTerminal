@@ -23,3 +23,16 @@ client 主类设置网关和子设备三属性
 -sp 设备id 属性json
 例： -sp 20210603009 {"full-open":0,"full-close":1}
 
+DirectClient 直连设备
+
+-df 发送终端固件版本
+
+-df 1111111114444 {"tag":"zlnj","value":{"other":"1.0.0"},"time":1524448722000}
+
+-dp 上报下载进度
+-dp 1111111114444 {"tag":"zlnj","name":"other","version":"1.0.2","step":"90"}
+
+-dr 上报升级结果
+-dr 1111111114444 {"tag":"zlnj","name":"other","version":"1.0.2","result":"200","desc":"固件升级成功。"}
+
+

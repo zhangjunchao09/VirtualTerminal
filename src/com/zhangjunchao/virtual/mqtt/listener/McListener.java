@@ -15,7 +15,10 @@ import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
 
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class McListener {
@@ -34,15 +37,12 @@ public class McListener {
         this.parentDevice = parentDevice;
     }
 
-    public void initMQTTListener() {
+    public void initMQTTListener(int deviceType) {
         try {
 
             String deviceId = parentDevice.getDeviceId();
             String productId = parentDevice.getProductId();
             String secret = parentDevice.getSecret();
-
-            String login_reply_topic = parentDevice.getLoginReplySubscribeTopic();
-            String property_set_topic = parentDevice.getPropertySubscribeTopic();
 
             SignInfo signInfoParent = Signature.mqttInfo(deviceId, productId, secret);
 
@@ -58,16 +58,28 @@ public class McListener {
             options_sub.setPassword(signInfoParent.getPassword().toCharArray());
             // 设置会话心跳时间 单位为秒 服务器会每隔90秒的时间向客户端发送个消息判断客户端是否在线，但这个方法并没有重连的机制
             options_sub.setKeepAliveInterval(90);
-            //订阅topic定义
-            int[] Qos = new int[]{0, 0};
-            String[] topics = new String[]{login_reply_topic, property_set_topic};
+            //订阅topic
+            List<String> topics;
+            switch (deviceType) {
+                case 2: //直连设备
+                    topics = parentDevice.dLoginSubTopic();
+                    break;
+                default: //默认网关
+                    topics = parentDevice.pLoginSubTopic();
 
+            }
+            int[] Qos = new int[topics.size()];
+            for (int i = 0; i < topics.size(); i++) {
+                Qos[i] = 0;
+            }
             // 设置回调
             client_sub.setCallback(new MyMqttCallbackExtended(this));
             //连接mqtt服务器broker
             client_sub.connect(options_sub);
-            //订阅消息
-            client_sub.subscribe(topics, Qos);
+            if (null != topics && topics.size() > 0) {
+                //订阅消息
+                client_sub.subscribe(topics.toArray(new String[topics.size()]), Qos);
+            }
         } catch (Exception e) {
             // TODO Auto-generated catch block
             System.err.println("init listener MQTT err info: {}" + e.toString());
@@ -106,14 +118,21 @@ public class McListener {
         String loginJSON = GsonUtils.toJson(childDeviceLoginInfo, false);
         MqttMessage msg_pub = new MqttMessage(loginJSON.getBytes());
         msg_pub.setQos(0);
+
+
         try {
             publish(login_topic, msg_pub);
             childDevices.put(childDevice.getDeviceId(), childDevice);
-
-            subscribe(childDevice.getPropertySubscribeTopic(), 0);
+            childDevice.cLoginSubTopic().stream().forEach(s -> {
+                try {
+                    subscribe(s, 0);
+                } catch (MqttException e) {
+                    System.err.println("=======订阅子设备属性设置topic异常:" + s + e.toString());
+                }
+            });
 
         } catch (MqttException e) {
-            System.err.println("=======登陆子设备/订阅子设备属性设置topic异常" + e.toString());
+            System.err.println("=======登陆子设备异常" + e.toString());
         }
     }
 
@@ -128,6 +147,36 @@ public class McListener {
 
     public void subscribe(String topic, int qos) throws MqttException {
         this.client_sub.subscribe(topic, qos);
+    }
+
+    public void postDeviceUpgradeResult(String deviceId, String params) throws MqttException {
+        DeviceInfo deviceInfo = this.getDevice(deviceId);
+        if (deviceInfo != null) {
+            String senJson = String.format("{\"id\":123,\"version\":\"1.0\",\"params\":%s}", params);
+            MqttMessage content = new MqttMessage(senJson.getBytes());
+            content.setQos(0);
+            this.publish(deviceInfo.getOtaUpgradeResultTopic(), content);
+        }
+    }
+
+    public void postDeviceUpgradeProgress(String deviceId, String params) throws MqttException {
+        DeviceInfo deviceInfo = this.getDevice(deviceId);
+        if (deviceInfo != null) {
+            String senJson = String.format("{\"id\":123,\"version\":\"1.0\",\"params\":%s}", params);
+            MqttMessage content = new MqttMessage(senJson.getBytes());
+            content.setQos(0);
+            this.publish(deviceInfo.getOtaUpgradeProgressTopic(), content);
+        }
+    }
+
+    public void postDeviceInform(String deviceId, String params) throws MqttException {
+        DeviceInfo deviceInfo = this.getDevice(deviceId);
+        if (deviceInfo != null) {
+            String senJson = String.format("{\"id\":123,\"version\":\"1.0\",\"params\":%s}", params);
+            MqttMessage content = new MqttMessage(senJson.getBytes());
+            content.setQos(0);
+            this.publish(deviceInfo.getOtaInformTopic(), content);
+        }
     }
 
     public void postProperty(String deviceId, Map<String, Object> params) throws MqttException {
